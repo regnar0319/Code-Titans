@@ -10,6 +10,8 @@ class SimulateRequest(BaseModel):
     origin_lat:float=Field(ge=-90,le=90); origin_lng:float=Field(ge=-180,le=180)
     triage_code:int=Field(ge=0,le=4); payload_hex:str=Field(min_length=32,max_length=32); max_ttl:int=Field(default=7,ge=1,le=7)
 class ToggleResponse(BaseModel): node_id:str; status:str
+class BatteryRequest(BaseModel): battery_percent:float=Field(ge=0,le=100)
+class EdgeToggleRequest(BaseModel): blocked:bool
 class SimulationResponse(BaseModel): status:str; trace:list[dict[str,Any]]; alternates:list[list[str]]
 SEED_NODES=[
  {"id":"BASE-GW-00","latitude":32.3126,"longitude":77.1628,"elevation_m":2050,"tx_power_dbm":22},
@@ -29,5 +31,17 @@ def toggle(node_id:str)->ToggleResponse:
         online=mesh.nodes[node_id].status=="OFFLINE"; mesh.set_node_status(node_id,online)
         return ToggleResponse(node_id=node_id,status=mesh.nodes[node_id].status)
     except KeyError as error:raise HTTPException(status_code=404,detail="node not found") from error
+@router.post("/nodes/{node_id}/battery",response_model=ToggleResponse)
+def set_battery(node_id:str,request:BatteryRequest)->ToggleResponse:
+    try:
+        mesh.set_node_battery(node_id,request.battery_percent)
+        return ToggleResponse(node_id=node_id,status=mesh.nodes[node_id].status)
+    except KeyError as error:raise HTTPException(status_code=404,detail="node not found") from error
+@router.post("/edges/{from_id}/{to_id}/block")
+def block_edge(from_id:str,to_id:str,request:EdgeToggleRequest)->dict[str,Any]:
+    try:
+        mesh.set_edge_blocked(from_id,to_id,request.blocked)
+        return {"from":from_id,"to":to_id,"blocked":request.blocked,"version":mesh.version}
+    except KeyError as error:raise HTTPException(status_code=404,detail="edge not found") from error
 @router.get("/topology")
 def topology()->dict[str,Any]:return mesh.topology_payload()

@@ -1,6 +1,7 @@
 import unittest
 from engine.mesh.rf_models import haversine_km, path_loss_db, rssi_snr, packet_delivery_ratio
 from engine.mesh.graph_engine import RFMeshTopology
+from engine.routing.router import MeshRouter
 
 class TestRFMeshEngine(unittest.TestCase):
     def test_haversine(self):
@@ -30,6 +31,27 @@ class TestRFMeshEngine(unittest.TestCase):
         
         res = topo.route_emergency_packet(32.1, 77.1, "00000000000000000000000000000000", 7)
         self.assertIn(res["status"], ["DELIVERED", "DROPPED"])
+
+    def test_blocked_edge_not_used_and_notifies_router(self):
+        topo = RFMeshTopology()
+        topo.nodes = {
+            "BASE-GW-00": type("Node", (), {})(),
+        }
+        topo.graph.add_edges_from([
+            ("ORIGIN", "PRIMARY", {"weight": 1}),
+            ("PRIMARY", "BASE-GW-00", {"weight": 1}),
+            ("ORIGIN", "ALTERNATE", {"weight": 2}),
+            ("ALTERNATE", "BASE-GW-00", {"weight": 2}),
+        ])
+        topo.version = 1
+        router = MeshRouter("ORIGIN")
+        router.attach_topology(topo)
+        packet = router.enqueue_packet("p-1", b"frame", "BASE-GW-00")
+        self.assertEqual(packet.next_hop, "PRIMARY")
+        topo.set_edge_blocked("PRIMARY", "BASE-GW-00")
+        self.assertEqual(packet.next_hop, "ALTERNATE")
+        self.assertEqual(packet.routing_header["next_hop"], "ALTERNATE")
+        router.close()
 
 if __name__ == "__main__":
     unittest.main()
