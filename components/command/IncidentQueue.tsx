@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp, HeartPulse, Radio, ShieldCheck, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, HeartPulse } from 'lucide-react';
 import { IncidentRecord, IncidentStatus, TriageType } from './types';
 
 interface IncidentQueueProps {
