@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Circle, MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import { Crosshair, Map as MapIcon, Radio } from 'lucide-react';
@@ -56,6 +57,14 @@ export default function IncidentMap({
 }: IncidentMapProps) {
     const selected = incidents.find((incident) => incident.id === selectedIncidentId) ?? incidents[0];
 
+    // A disconnected browser immediately enters safe local-cache mode; the HUD remains available for manual control.
+    useEffect(() => {
+        const enterAirGapMode = () => onAirGapChange(true);
+        if (!navigator.onLine) enterAirGapMode();
+        window.addEventListener('offline', enterAirGapMode);
+        return () => window.removeEventListener('offline', enterAirGapMode);
+    }, [onAirGapChange]);
+
     return (
         <section className="relative h-full min-h-[520px] overflow-hidden bg-zinc-950">
             <MapContainer
@@ -69,6 +78,7 @@ export default function IncidentMap({
                     <TileLayer
                         attribution="&copy; OpenTopoMap contributors"
                         url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                        eventHandlers={{ tileerror: () => onAirGapChange(true) }}
                     />
                 ) : (
                     <TileLayer
