@@ -31,6 +31,22 @@ interface Segment {
     glowClass: string;
 }
 
+interface DecodedFrame {
+    bytes: Uint8Array;
+    displayHex: string;
+    nodeId: number;
+    latitude: number;
+    longitude: number;
+    triageCode: number;
+    isConscious: boolean;
+    isGroup: boolean;
+    reservedBits: number;
+    batteryLevel: number;
+    batteryPercent: number;
+    ttl: number;
+    receivedCrc: number;
+}
+
 const SEGMENTS: Segment[] = [
     {
         id: 'node',
@@ -371,7 +387,7 @@ function SegmentInterpretation({
     crcIsValid,
 }: {
     segment: SegmentId;
-    frame: ReturnType<typeof decodeFrameForDisplay>;
+    frame: DecodedFrame;
     crcIsValid: boolean;
 }) {
     const values: Partial<Record<SegmentId, string>> = {
@@ -390,19 +406,19 @@ function BitFieldRibbon({
 }: {
     segment: 'triage' | 'telemetry';
     byte: number;
-    frame: ReturnType<typeof decodeFrameForDisplay>;
+    frame: DecodedFrame;
 }) {
     const isTriage = segment === 'triage';
     const parts = isTriage
         ? [
-            { label: '7–6 RESERVED', value: frame.reservedBits.toString(2).padStart(2, '0'), width: 'w-1/4', tone: 'bg-zinc-700' },
-            { label: '5 GROUP', value: frame.isGroup ? '1' : '0', width: 'w-1/8', tone: 'bg-rose-500/70' },
+            { label: '7–6 RESERVED', value: frame.reservedBits.toString(2).padStart(2, '0'), width: 'basis-1/4', tone: 'bg-zinc-700' },
+            { label: '5 GROUP', value: frame.isGroup ? '1' : '0', width: 'basis-[12.5%]', tone: 'bg-rose-500/70' },
             { label: '4 CONSCIOUS', value: frame.isConscious ? '1' : '0', width: 'w-1/8', tone: 'bg-rose-400/80' },
-            { label: '3–0 TYPE', value: frame.triageCode.toString(2).padStart(4, '0'), width: 'w-1/2', tone: 'bg-rose-600/80' },
+            { label: '3–0 TYPE', value: frame.triageCode.toString(2).padStart(4, '0'), width: 'basis-1/2', tone: 'bg-rose-600/80' },
         ]
         : [
-            { label: '7–5 TTL', value: frame.ttl.toString(2).padStart(3, '0'), width: 'w-3/8', tone: 'bg-amber-600/80' },
-            { label: '4–0 BATTERY', value: frame.batteryLevel.toString(2).padStart(5, '0'), width: 'w-5/8', tone: 'bg-amber-400/80' },
+            { label: '7–5 TTL', value: frame.ttl.toString(2).padStart(3, '0'), width: 'basis-[37.5%]', tone: 'bg-amber-600/80' },
+            { label: '4–0 BATTERY', value: frame.batteryLevel.toString(2).padStart(5, '0'), width: 'basis-[62.5%]', tone: 'bg-amber-400/80' },
         ];
 
     return (
@@ -429,23 +445,4 @@ function BitFieldRibbon({
             </p>
         </div>
     );
-}
-
-/** Kept as a type-only mirror of the memoized frame object. */
-function decodeFrameForDisplay() {
-    return {
-        bytes: new Uint8Array(16),
-        displayHex: '',
-        nodeId: 0,
-        latitude: 0,
-        longitude: 0,
-        triageCode: 0,
-        isConscious: false,
-        isGroup: false,
-        reservedBits: 0,
-        batteryLevel: 0,
-        batteryPercent: 0,
-        ttl: 0,
-        receivedCrc: 0,
-    };
 }
