@@ -1,0 +1,17 @@
+# Python virtual environments
+venv/
+env/
+ENV/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Raw data files & local logs
+*.raw
+*.bin
+*.log
+data/
+datasets/
