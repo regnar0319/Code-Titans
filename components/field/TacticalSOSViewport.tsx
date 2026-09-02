@@ -183,7 +183,7 @@ export default function TacticalSOSViewport() {
             console.error('Failed to enqueue packet:', error);
         }
 
-        // Switch to transmitting state
+        // Show the persisted packet's queued state
         setIsTransmitting(true);
         setTransmitStartTime(Date.now());
 
@@ -250,7 +250,7 @@ export default function TacticalSOSViewport() {
         }, 500);
     }, []);
 
-    // ========== Transmit Timer ==========
+    // ========== Queue Status Timer ==========
     useEffect(() => {
         if (!isTransmitting || !transmitStartTime) return;
 
