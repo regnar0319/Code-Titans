@@ -1,25 +1,49 @@
 {
   "name": "code-titans",
   "version": "1.0.0",
-  "description": "16-byte binary frame protocol for Laksha",
+  "description": "16-byte binary frame protocol for Laksha - off-grid emergency communication",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/regnar0319/Code-Titans.git"
   },
-  "keywords": [],
+  "keywords": [
+    "laksha",
+    "protocol",
+    "emergency",
+    "iot",
+    "lora",
+    "off-grid",
+    "binary-protocol"
+  ],
   "author": "regnar0319",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/regnar0319/Code-Titans/issues"
   },
   "homepage": "https://github.com/regnar0319/Code-Titans#readme",
+  "dependencies": {
+    "lucide-react": "^0.449.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
     "@types/node": "^26.4.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.17",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
   }

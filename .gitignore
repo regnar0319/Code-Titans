@@ -15,3 +15,33 @@ __pycache__/
 *.log
 data/
 datasets/
+
+# Node & Next.js
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test Coverage
+coverage/
+.nyc_output/
+
