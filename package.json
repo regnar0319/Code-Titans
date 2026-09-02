@@ -1,17 +1,17 @@
 {
   "name": "code-titans",
   "version": "1.0.0",
-  "description": "",
+  "description": "16-byte binary frame protocol for Laksha",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/regnar0319/Code-Titans.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "regnar0319",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {

@@ -3,16 +3,16 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "baseUrl": ".",
+    "types": ["node"],
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "include": ["lib/**/*", "**/*.test.ts"]
+  "include": ["src/**/*", "lib/**/*", "**/*.test.ts"]
 }
