@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import L from 'leaflet';
-import { Circle, CircleMarker, Marker, Polyline, Popup, Tooltip } from 'react-leaflet';
-import { Activity, BatteryCharging, Radio, Sun } from 'lucide-react';
+import { Circle, Marker, Polyline, Popup, Tooltip } from 'react-leaflet';
+import { Activity, Radio } from 'lucide-react';
 
 export type RFNodeType =
     | 'BASE_GATEWAY'
@@ -146,10 +146,10 @@ export function RFTopologyLayer({ nodes = MOUNTAIN_NETWORK_TOPOLOGY }: RFTopolog
                 const color = STATUS_COLOR[node.status];
                 const outerRadius = node.effectiveRangeKm * 1000;
                 return (
-                    <span key={`coverage-${node.id}`}>
+                    <Fragment key={`coverage-${node.id}`}>
                         <Circle center={node.coordinates} radius={outerRadius / 2} pathOptions={{ color, fillColor: color, fillOpacity: node.status === 'OFFLINE' ? 0.02 : 0.15, weight: 1.5 }} />
                         <Circle center={node.coordinates} radius={outerRadius} pathOptions={{ color, fillColor: color, fillOpacity: node.status === 'OFFLINE' ? 0.01 : 0.05, weight: 1, dashArray: '6 10' }} />
-                    </span>
+                    </Fragment>
                 );
             })}
 
@@ -158,11 +158,11 @@ export function RFTopologyLayer({ nodes = MOUNTAIN_NETWORK_TOPOLOGY }: RFTopolog
                 const color = isOperational ? '#06B6D4' : '#64748B';
                 const distance = haversineKm(from.coordinates, to.coordinates);
                 return (
-                    <span key={key}>
+                    <Fragment key={key}>
                         <Polyline positions={[from.coordinates, to.coordinates]} pathOptions={{ color, weight: 2, opacity: isOperational ? 0.9 : 0.35, dashArray: '7 9' }} />
                         <Marker position={midpoint(from.coordinates, to.coordinates)} interactive={false}
                             icon={L.divIcon({ className: 'laksha-link-label', html: `<span style="display:block;border:1px solid ${color};border-radius:4px;background:#050505dd;color:${color};padding:2px 5px;font:700 10px monospace;white-space:nowrap">${distance.toFixed(1)} km</span>`, iconAnchor: [25, 10] })} />
-                    </span>
+                    </Fragment>
                 );
             })}
 
@@ -171,7 +171,6 @@ export function RFTopologyLayer({ nodes = MOUNTAIN_NETWORK_TOPOLOGY }: RFTopolog
                     <Tooltip permanent={toggles.badges} direction="top" offset={[0, -22]} className="!border-zinc-700 !bg-zinc-950 !text-zinc-100">
                         <span className="font-mono text-[10px]">{node.id} | Alt: {node.altitudeMeters}m | Batt: {node.batteryPercent}%</span>
                     </Tooltip>
-                    {toggles.badges && <CircleMarker center={node.coordinates} radius={3} pathOptions={{ color: STATUS_COLOR[node.status], fillColor: STATUS_COLOR[node.status], fillOpacity: 1 }} />}
                     <Popup minWidth={245}>
                         <div className="space-y-3 bg-zinc-950 font-mono text-xs text-zinc-100">
                             <div><p className="font-black text-sky-300">{node.name}</p><p className="text-zinc-400">{node.id} · {node.altitudeMeters}m ASL</p></div>
