@@ -3,6 +3,15 @@
  * Production-grade offline-first queue with auto-lock release, exponential backoff,
  * priority dequeuing, and seamless IndexedDB to localStorage/in-memory fallback.
  */
+function calculateStringHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32-bit signed integer
+  }
+  return hash;
+}
 
 export interface QueueItem {
   id: string;
@@ -309,7 +318,7 @@ export class StoreAndForwardQueue {
       BACKOFF_MAX_DELAY_MS
     );
     // Use a deterministic pseudo-random jitter derived from ID and retryCount to avoid fluctuating checks
-    const jitter = (Math.abs(hashCode(item.id + item.retryCount)) % 2000);
+    const jitter = Math.abs(calculateStringHash(item.id + String(item.retryCount))) % 2000;
     return now - item.lastAttemptAt >= delay + jitter;
   }
 

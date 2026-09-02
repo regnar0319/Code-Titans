@@ -239,14 +239,37 @@ export function frameToHex(buffer: Uint8Array): string {
  * @throws Error if hex is invalid or wrong length
  */
 export function hexToFrame(hex: string): Uint8Array {
-    if (!/^[0-9a-f]{32}$/i.test(hex)) {
+    if (typeof hex !== 'string') {
+        throw new Error('Invalid hex length: hex input must be a string');
+    }
+
+    const trimmed = hex.trim();
+    let cleaned = '';
+
+    // If it contains spaces, dashes, or colons, it MUST be a uniformly formatted 
+    // byte-separated string (e.g., 16 tokens of exactly 2 hex characters).
+    // Any irregular spacing (like '00 000000...') will result in wrong token counts and must throw.
+    if (/[\s\-:]/.test(trimmed)) {
+        const tokens = trimmed.split(/[\s\-:]+/);
+        if (tokens.length === 16 && tokens.every(t => /^[0-9a-fA-F]{2}$/.test(t))) {
+            cleaned = tokens.join('');
+        } else {
+            throw new Error('Hex frame must contain exactly 32 hexadecimal characters');
+        }
+    } else {
+        cleaned = trimmed;
+    }
+
+    // Final strict validation: must be exactly 32 pure hexadecimal characters
+    if (cleaned.length !== 32 || !/^[0-9a-fA-F]{32}$/.test(cleaned)) {
         throw new Error('Hex frame must contain exactly 32 hexadecimal characters');
     }
-    const cleaned = hex.toLowerCase();
 
-    const buffer = new Uint8Array(16);
+    const frame = new Uint8Array(16);
     for (let i = 0; i < 16; i++) {
-        buffer[i] = parseInt(cleaned.slice(i * 2, i * 2 + 2), 16);
+        const byteHex = cleaned.substring(i * 2, i * 2 + 2);
+        frame[i] = parseInt(byteHex, 16);
     }
-    return buffer;
+
+    return frame;
 }
