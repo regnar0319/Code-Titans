@@ -15,7 +15,7 @@ import csv
 import json
 import math
 import sys
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, TextIO
@@ -149,23 +149,27 @@ def normalize_record(record: Mapping[str, Any], default_node_id: int | None = No
     }
 
 
-def _input_records(source: TextIO, input_format: str) -> Iterator[tuple[int, Mapping[str, Any]]]:
+def _input_records(
+    source: TextIO, input_format: str
+) -> Iterator[tuple[int, Mapping[str, Any], str | None]]:
     if input_format == "csv":
         for line_number, row in enumerate(csv.DictReader(source), start=2):
-            yield line_number, row
+            yield line_number, row, None
         return
 
     for line_number, line in enumerate(source, start=1):
         if not line.strip():
             continue
+        raw_record = {"raw": line.rstrip("\r\n")}
         try:
             record = json.loads(line)
         except json.JSONDecodeError as exc:
-            raise ValidationError(f"line {line_number}: invalid JSON: {exc.msg}") from exc
+            yield line_number, raw_record, f"invalid JSON: {exc.msg}"
+            continue
         if not isinstance(record, Mapping):
-            raise ValidationError(f"line {line_number}: JSON record must be an object")
-        yield line_number, record
-
+            yield line_number, raw_record, "JSON record must be an object"
+            continue
+        yield line_number, record, None
 
 def preprocess(
     source: TextIO,
@@ -177,7 +181,14 @@ def preprocess(
 ) -> PreprocessSummary:
     """Transform source records, writing accepted payloads and optional rejections as JSONL."""
     accepted = rejected = 0
-    for line_number, record in _input_records(source, input_format):
+    for line_number, record, parse_error in _input_records(source, input_format):
+        if parse_error is not None:
+            rejected += 1
+            if rejects is not None:
+                json.dump({"line": line_number, "error": parse_error, "record": record}, rejects, sort_keys=True)
+                rejects.write("\n")
+            continue
+
         try:
             payload = normalize_record(record, default_node_id)
         except ValidationError as exc:
