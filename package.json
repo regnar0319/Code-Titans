@@ -32,12 +32,15 @@
   },
   "homepage": "https://github.com/regnar0319/Code-Titans#readme",
   "dependencies": {
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.449.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.20",
     "@types/node": "^26.4.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

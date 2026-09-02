@@ -169,8 +169,36 @@ export default function TacticalSOSViewport() {
     }, [currentPayload]);
 
     // ========== Hold-to-Trigger Logic ==========
+    const completeSosActivation = useCallback(() => {
+        // Haptic feedback
+        if ('vibrate' in navigator) {
+            navigator.vibrate([100, 50, 100]);
+        }
+
+        // Enqueue packet
+        try {
+            const item = enqueueEmergencyPacket(currentPayload);
+            console.log('Emergency packet enqueued:', item.id);
+        } catch (error) {
+            console.error('Failed to enqueue packet:', error);
+        }
+
+        // Show the persisted packet's queued state
+        setIsTransmitting(true);
+        setTransmitStartTime(Date.now());
+
+        // Clear hold state
+        setHoldProgress(0);
+        setIsHolding(false);
+        holdStartTimeRef.current = null;
+
+        if (holdAnimationFrameRef.current) {
+            cancelAnimationFrame(holdAnimationFrameRef.current);
+        }
+    }, [currentPayload]);
+
     const handleMouseDown = useCallback(() => {
-        if (isTransmitting) return;
+        if (isTransmitting || holdStartTimeRef.current !== null) return;
 
         setIsHolding(true);
         holdStartTimeRef.current = Date.now();
@@ -192,7 +220,7 @@ export default function TacticalSOSViewport() {
         };
 
         holdAnimationFrameRef.current = requestAnimationFrame(animateHold);
-    }, [isTransmitting]);
+    }, [isTransmitting, completeSosActivation]);
 
     const handleMouseUp = useCallback(() => {
         if (!holdStartTimeRef.current) return;
@@ -222,35 +250,7 @@ export default function TacticalSOSViewport() {
         }, 500);
     }, []);
 
-    const completeSosActivation = useCallback(() => {
-        // Haptic feedback
-        if ('vibrate' in navigator) {
-            navigator.vibrate([100, 50, 100]);
-        }
-
-        // Enqueue packet
-        try {
-            const item = enqueueEmergencyPacket(currentPayload);
-            console.log('Emergency packet enqueued:', item.id);
-        } catch (error) {
-            console.error('Failed to enqueue packet:', error);
-        }
-
-        // Switch to transmitting state
-        setIsTransmitting(true);
-        setTransmitStartTime(Date.now());
-
-        // Clear hold state
-        setHoldProgress(0);
-        setIsHolding(false);
-        holdStartTimeRef.current = null;
-
-        if (holdAnimationFrameRef.current) {
-            cancelAnimationFrame(holdAnimationFrameRef.current);
-        }
-    }, [currentPayload]);
-
-    // ========== Transmit Timer ==========
+    // ========== Queue Status Timer ==========
     useEffect(() => {
         if (!isTransmitting || !transmitStartTime) return;
 
@@ -281,7 +281,7 @@ export default function TacticalSOSViewport() {
     // ========== Render ==========
 
     if (isTransmitting) {
-        return <TransmittingScreen elapsedTime={elapsedTime} payload={currentPayload} />;
+        return <QueuedScreen elapsedTime={elapsedTime} payload={currentPayload} />;
     }
 
     return (
@@ -363,10 +363,8 @@ export default function TacticalSOSViewport() {
                 <SOSButton
                     progress={holdProgress}
                     isHolding={isHolding}
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onTouchStart={handleMouseDown}
-                    onTouchEnd={handleMouseUp}
+                    onStart={handleMouseDown}
+                    onEnd={handleMouseUp}
                     disabled={isTransmitting}
                 />
             </footer>
@@ -612,20 +610,16 @@ function HexInspectorDrawer({
 interface SOSButtonProps {
     progress: number; // 0-100
     isHolding: boolean;
-    onMouseDown: () => void;
-    onMouseUp: () => void;
-    onTouchStart: () => void;
-    onTouchEnd: () => void;
+    onStart: () => void;
+    onEnd: () => void;
     disabled: boolean;
 }
 
 function SOSButton({
     progress,
     isHolding,
-    onMouseDown,
-    onMouseUp,
-    onTouchStart,
-    onTouchEnd,
+    onStart,
+    onEnd,
     disabled,
 }: SOSButtonProps) {
     const ringRadius = 55; // SVG circle radius
@@ -635,17 +629,14 @@ function SOSButton({
     return (
         <div
             className="relative w-40 h-40 flex items-center justify-center"
-            onMouseDown={() => {
-                onMouseDown();
-                onTouchStart();
+            onPointerDown={(event) => {
+                if (disabled) return;
+                event.currentTarget.setPointerCapture(event.pointerId);
+                onStart();
             }}
-            onMouseUp={() => {
-                onMouseUp();
-                onTouchEnd();
-            }}
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-            onMouseLeave={onMouseUp}
+            onPointerUp={onEnd}
+            onPointerCancel={onEnd}
+            onLostPointerCapture={onEnd}
         >
             {/* Pulsing Background Glow */}
             <div
@@ -738,15 +729,15 @@ function SOSButton({
 }
 
 // ============================================================================
-// TRANSMITTING SCREEN
+// SOS QUEUED SCREEN
 // ============================================================================
 
-interface TransmittingScreenProps {
+interface QueuedScreenProps {
     elapsedTime: number;
     payload: FramePayload;
 }
 
-function TransmittingScreen({ elapsedTime, payload }: TransmittingScreenProps) {
+function QueuedScreen({ elapsedTime, payload }: QueuedScreenProps) {
     const queueStats = getQueueStats();
 
     return (
@@ -764,7 +755,7 @@ function TransmittingScreen({ elapsedTime, payload }: TransmittingScreenProps) {
                     TRANSMITTING
                 </h1>
                 <p className="text-lg text-white font-mono">
-                    RF RELAY ACTIVE
+                    AWAITING RADIO TRANSPORT
                 </p>
             </div>
 
@@ -797,7 +788,7 @@ function TransmittingScreen({ elapsedTime, payload }: TransmittingScreenProps) {
 
             {/* Instructions */}
             <p className="text-xs text-zinc-500 text-center max-w-xs">
-                Emergency beacon active. Retransmitting until confirmed receipt or device reset.
+                SOS packet is stored locally. A radio transport must send it and update its delivery status.
             </p>
         </div>
     );
