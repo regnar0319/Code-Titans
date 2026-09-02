@@ -375,4 +375,30 @@ describe('Laksha Protocol - 16-Byte Frame', () => {
             expect(hex1).toBe(hex2);
         });
     });
+
+    describe('Input validation', () => {
+        const validPayload: FramePayload = {
+            nodeId: 42,
+            latitude: 27.986065,
+            longitude: 86.909249,
+            triageType: TriageType.MEDICAL,
+            isConscious: true,
+            groupCount: false,
+            batteryPercent: 75,
+            ttl: 3,
+        };
+
+        it('rejects values that would otherwise be silently coerced', () => {
+            expect(() => serializeFrame({ ...validPayload, nodeId: 1.5 })).toThrow('Invalid nodeId');
+            expect(() => serializeFrame({ ...validPayload, latitude: Number.NaN })).toThrow('Invalid latitude');
+            expect(() => serializeFrame({ ...validPayload, ttl: 2.5 })).toThrow('Invalid ttl');
+            expect(() => serializeFrame({ ...validPayload, triageType: 9 as TriageType })).toThrow('Invalid triageType');
+        });
+
+        it('rejects non-hex characters instead of stripping them', () => {
+            expect(() => hexToFrame('00 000000000000000000000000000000')).toThrow(
+                'Hex frame must contain exactly 32 hexadecimal characters'
+            );
+        });
+    });
 });
