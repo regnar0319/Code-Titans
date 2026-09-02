@@ -49,6 +49,12 @@ export function useEmergencySocket(path = '/ws/telemetry'): EmergencySocketState
     const heartbeatRef = useRef<{ sentAt: number } | null>(null);
     const stoppedRef = useRef(false);
 
+    const send = useCallback((message: Record<string, unknown>) => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify(message));
+        }
+    }, []);
+
     const applyEvent = useCallback((event: TelemetryEvent) => {
         if (event.type === 'HOP_ADVANCED') setLastHopEvent(event as HopEvent);
         if (event.type === 'INCIDENT_INGESTED' || event.type === 'INCIDENT_UPDATED') {
@@ -107,7 +113,7 @@ export function useEmergencySocket(path = '/ws/telemetry'): EmergencySocketState
                 } else if (event.type === 'HEARTBEAT') {
                     if (heartbeatRef.current) setPingLatencyMs(Date.now() - heartbeatRef.current.sentAt);
                     heartbeatRef.current = { sentAt: Date.now() };
-                    socket.send(JSON.stringify({ action: 'PONG' }));
+                    send({ action: 'PONG' });
                 } else {
                     processEvent(event);
                 }
@@ -124,7 +130,7 @@ export function useEmergencySocket(path = '/ws/telemetry'): EmergencySocketState
                 reconnectTimerRef.current = setTimeout(connect, delay);
             } else if (!stoppedRef.current) setConnectionState('DISCONNECTED');
         };
-    }, [path, processEvent]);
+    }, [path, processEvent, send]);
 
     useEffect(() => {
         stoppedRef.current = false;
@@ -147,15 +153,15 @@ export function useEmergencySocket(path = '/ws/telemetry'): EmergencySocketState
 
     const subscribe = useCallback((topic: Topic) => {
         subscriptionsRef.current.add(topic);
-        socketRef.current?.send(JSON.stringify({ action: 'SUBSCRIBE', topic }));
-    }, []);
+        send({ action: 'SUBSCRIBE', topic });
+    }, [send]);
     const unsubscribe = useCallback((topic: Topic) => {
         subscriptionsRef.current.delete(topic);
-        socketRef.current?.send(JSON.stringify({ action: 'UNSUBSCRIBE', topic }));
-    }, []);
+        send({ action: 'UNSUBSCRIBE', topic });
+    }, [send]);
     const dispatchAction = useCallback((actionType: string, payload: unknown) => {
-        socketRef.current?.send(JSON.stringify({ action: actionType, payload }));
-    }, []);
+        send({ action: actionType, payload });
+    }, [send]);
 
     return { connectionState, lastHopEvent, incidents, nodeStatuses, lastReceivedSequence, pingLatencyMs, subscribe, unsubscribe, dispatchAction };
 }
