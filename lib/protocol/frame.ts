@@ -88,21 +88,27 @@ export function calculateCRC16(buffer: Uint8Array): number {
  * @throws Error if payload.ttl outside [0, 7]
  */
 export function serializeFrame(payload: FramePayload): Uint8Array {
-    // Validate ranges
-    if (payload.nodeId < 0 || payload.nodeId > 0xffffffff) {
+    // Validate values before JavaScript's numeric coercions can alter the frame.
+    if (!Number.isInteger(payload.nodeId) || payload.nodeId < 0 || payload.nodeId > 0xffffffff) {
         throw new Error(`Invalid nodeId: ${payload.nodeId}`);
     }
-    if (payload.latitude < -90 || payload.latitude > 90) {
+    if (!Number.isFinite(payload.latitude) || payload.latitude < -90 || payload.latitude > 90) {
         throw new Error(`Invalid latitude: ${payload.latitude}`);
     }
-    if (payload.longitude < -180 || payload.longitude > 180) {
+    if (!Number.isFinite(payload.longitude) || payload.longitude < -180 || payload.longitude > 180) {
         throw new Error(`Invalid longitude: ${payload.longitude}`);
     }
-    if (payload.batteryPercent < 0 || payload.batteryPercent > 100) {
+    if (!Number.isFinite(payload.batteryPercent) || payload.batteryPercent < 0 || payload.batteryPercent > 100) {
         throw new Error(`Invalid batteryPercent: ${payload.batteryPercent}`);
     }
-    if (payload.ttl < 0 || payload.ttl > 7) {
+    if (!Number.isInteger(payload.ttl) || payload.ttl < 0 || payload.ttl > 7) {
         throw new Error(`Invalid ttl: ${payload.ttl}`);
+    }
+    if (!Number.isInteger(payload.triageType) || !Object.values(TriageType).includes(payload.triageType)) {
+        throw new Error(`Invalid triageType: ${payload.triageType}`);
+    }
+    if (typeof payload.isConscious !== 'boolean' || typeof payload.groupCount !== 'boolean') {
+        throw new Error('isConscious and groupCount must be booleans');
     }
 
     // Create 16-byte buffer
@@ -233,12 +239,10 @@ export function frameToHex(buffer: Uint8Array): string {
  * @throws Error if hex is invalid or wrong length
  */
 export function hexToFrame(hex: string): Uint8Array {
-    const cleaned = hex.toLowerCase().replace(/[^0-9a-f]/g, '');
-    if (cleaned.length !== 32) {
-        throw new Error(
-            `Invalid hex length: expected 32 chars, got ${cleaned.length}`
-        );
+    if (!/^[0-9a-f]{32}$/i.test(hex)) {
+        throw new Error('Hex frame must contain exactly 32 hexadecimal characters');
     }
+    const cleaned = hex.toLowerCase();
 
     const buffer = new Uint8Array(16);
     for (let i = 0; i < 16; i++) {
