@@ -246,12 +246,13 @@ export function hexToFrame(hex: string): Uint8Array {
     const trimmed = hex.trim();
     let cleaned = '';
 
-    // If it contains spaces, dashes, or colons, it MUST be a uniformly formatted 
-    // byte-separated string (e.g., 16 tokens of exactly 2 hex characters).
-    // Any irregular spacing (like '00 000000...') will result in wrong token counts and must throw.
+    // Separated input may use either byte groups or the protocol's 16-bit groups.
+    // Groups must be uniform so malformed input cannot be silently normalized.
     if (/[\s\-:]/.test(trimmed)) {
         const tokens = trimmed.split(/[\s\-:]+/);
-        if (tokens.length === 16 && tokens.every(t => /^[0-9a-fA-F]{2}$/.test(t))) {
+        const byteGroups = tokens.length === 16 && tokens.every(t => /^[0-9a-fA-F]{2}$/.test(t));
+        const wordGroups = tokens.length === 8 && tokens.every(t => /^[0-9a-fA-F]{4}$/.test(t));
+        if (byteGroups || wordGroups) {
             cleaned = tokens.join('');
         } else {
             throw new Error('Hex frame must contain exactly 32 hexadecimal characters');
