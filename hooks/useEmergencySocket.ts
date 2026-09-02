@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type ConnectionState = 'CONNECTING' | 'CONNECTED' | 'RECONNECTING' | 'DISCONNECTED' | 'ERROR';
 export type Topic = 'mesh:hops' | 'mesh:incidents' | 'mesh:nodes';
-export type TelemetryEvent = { topic?: string; type: string; sequence?: number; [key: string]: unknown };
+export type TelemetryEvent = { topic?: string; type: string; sequence?: number;[key: string]: unknown };
 export type HopEvent = TelemetryEvent & { type: 'HOP_ADVANCED'; sequence: number };
 export type IncidentEvent = TelemetryEvent & { incident_id: string; type: string; sequence: number };
 export type NodeStatusEvent = TelemetryEvent & { node_id: string; status: 'NOMINAL' | 'DEGRADED' | 'OFFLINE'; battery: number; sequence: number };
@@ -93,7 +93,7 @@ export function useEmergencySocket(path = '/ws/telemetry'): EmergencySocketState
     const connect = useCallback(() => {
         if (stoppedRef.current || document.visibilityState !== 'visible') return;
         setConnectionState(reconnectAttemptRef.current ? 'RECONNECTING' : 'CONNECTING');
-        const socket = new WebSocket(socketUrl(path));
+        const socket = new WebSocket("ws://localhost:8000/ws/telemetry");
         socketRef.current = socket;
         socket.onopen = () => {
             reconnectAttemptRef.current = 0;
