@@ -1,15 +1,15 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Laksha - Emergency Communication',
-    description: 'Off-grid emergency communication system for mountainous regions',
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
-    },
+    title: 'PR•ORBIT - Offline Emergency Communication',
+    description: 'Internet-independent emergency communication platform',
+    // Keep title, description, icons, etc. here
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    themeColor: '#0f172a', // Move any themeColor or scale properties here
 };
 
 export default function RootLayout({
@@ -19,14 +19,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <head>
-                <meta name="theme-color" content="#000000" />
-                <meta name="apple-mobile-web-app-capable" content="yes" />
-                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-            </head>
-            <body className="bg-black text-white antialiased">
-                {children}
-            </body>
+            <body>{children}</body>
         </html>
     );
 }

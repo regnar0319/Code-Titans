@@ -22,3 +22,11 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Laksha Telemetry Gateway", lifespan=lifespan)
 app.include_router(router)
+
+@app.get("/")
+async def root():
+    return {"status": "online", "system": "PR•ORBIT Laksha Gateway"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("engine.gateway.main:app", host="0.0.0.0", port=8000, reload=True)

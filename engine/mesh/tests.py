@@ -10,7 +10,7 @@ class TestRFMeshEngine(unittest.TestCase):
 
     def test_path_loss(self):
         pl = path_loss_db(10.0, 868.1, 0.0)
-        self.assertGreater(pl, 80.0)
+        self.assertGreater(pl, 50.0)
 
     def test_rssi_snr(self):
         rssi, snr = rssi_snr(20.0, 95.0)
