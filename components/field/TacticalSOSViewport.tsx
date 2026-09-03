@@ -15,6 +15,7 @@ const FALLBACK_GPS: GPSPosition = {
   latitude: 27.986065, longitude: 86.909249, accuracy: 12, timestamp: Date.now(),
 };
 const SIMULATED_DEVICE_ID = Math.floor(Math.random() * 0xffffffff);
+const EMPTY_QUEUE_STATS = { total: 0, queued: 0, transmitting: 0, delivered: 0, failed: 0 };
 
 function PanelLabel({ children }: { children: React.ReactNode }) {
   return <p className="mb-3 font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{children}</p>;
@@ -33,12 +34,17 @@ export default function TacticalSOSViewport() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [hexPayload, setHexPayload] = useState('');
   const [showHexInspector, setShowHexInspector] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   const holdStartTimeRef = useRef<number | null>(null);
   const holdAnimationFrameRef = useRef<number | null>(null);
   const touchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const gpsWatchIdRef = useRef<number | null>(null);
   const transmitIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     let batteryUnsubscribe: (() => void) | null = null;
@@ -153,9 +159,9 @@ export default function TacticalSOSViewport() {
     return () => clearTimeout(resetTimer);
   }, [isTransmitting, elapsedTime]);
 
-  if (isTransmitting) return <QueuedScreen elapsedTime={elapsedTime} payload={currentPayload} />;
+  const queueStats = isMounted ? getQueueStats() : EMPTY_QUEUE_STATS;
 
-  const queueStats = getQueueStats();
+  if (isTransmitting) return <QueuedScreen elapsedTime={elapsedTime} payload={currentPayload} queueStats={queueStats} />;
   const hasQueuedPackets = queueStats.queued + queueStats.transmitting > 0;
 
   return (
@@ -347,8 +353,9 @@ function SOSButton({ progress, isHolding, onStart, onEnd, disabled }: {
   </div>;
 }
 
-function QueuedScreen({ elapsedTime, payload }: { elapsedTime: number; payload: FramePayload }) {
-  const queueStats = getQueueStats();
+function QueuedScreen({ elapsedTime, payload, queueStats }: {
+  elapsedTime: number; payload: FramePayload; queueStats: ReturnType<typeof getQueueStats>;
+}) {
   return <div className="min-h-screen bg-[#05070a] px-4 py-8 text-white">
     <div className="mx-auto flex min-h-[80vh] max-w-md flex-col items-center justify-center rounded-2xl border border-amber-400/30 bg-zinc-950/80 p-6 text-center shadow-2xl shadow-black/60">
       <div className="mb-7 grid h-24 w-24 place-items-center rounded-full border border-red-400/50 bg-red-500/10 text-red-400 shadow-[0_0_35px_rgba(239,68,68,.25)]"><Radio size={43} className="animate-pulse" /></div>
