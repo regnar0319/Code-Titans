@@ -2,53 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+  background: #05070a;
+}
+
 * {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 html,
 body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background-color: #000000;
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #05070a;
+  color: #f4f4f5;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    overflow: hidden;
+  overflow-x: hidden;
 }
 
-/* High contrast focus states for accessibility */
+button {
+  -webkit-touch-callout: none;
+}
+
 button:focus-visible {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
+  outline: 2px solid #67e8f9;
+  outline-offset: 3px;
 }
 
-/* Smooth scrolling for inspectors */
+::selection {
+  background: #fbbf24;
+  color: #09090b;
+}
+
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #000000;
+  background: #09090b;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #404040;
-    border-radius: 3px;
+  border: 2px solid #09090b;
+  border-radius: 999px;
+  background: #3f3f46;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555555;
+  background: #71717a;
 }
