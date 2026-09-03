@@ -1,25 +1,21 @@
 import type { Metadata, Viewport } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-    title: 'PR•ORBIT - Offline Emergency Communication',
-    description: 'Internet-independent emergency communication platform',
-    // Keep title, description, icons, etc. here
+  title: 'Laksha — Offline Emergency Communication',
+  description: 'Internet-independent emergency communication platform',
 };
 
 export const viewport: Viewport = {
-    width: 'device-width',
-    initialScale: 1,
-    themeColor: '#0f172a', // Move any themeColor or scale properties here
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#020617',
 };
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    return (
-        <html lang="en">
-            <body>{children}</body>
-        </html>
-    );
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className="bg-slate-950 text-slate-100 antialiased">{children}</body>
+    </html>
+  );
 }
