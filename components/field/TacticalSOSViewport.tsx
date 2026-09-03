@@ -177,7 +177,7 @@ export default function TacticalSOSViewport() {
               <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" /></span>
               link active
             </span>
-            <span className={\`rounded-md border px-2.5 py-2 \${hasQueuedPackets ? 'border-amber-400/40 bg-amber-400/10 text-amber-300' : 'border-zinc-700 bg-zinc-900 text-zinc-400'}\`}>
+            <span className={`rounded-md border px-2.5 py-2 ${hasQueuedPackets ? 'border-amber-400/40 bg-amber-400/10 text-amber-300' : 'border-zinc-700 bg-zinc-900 text-zinc-400'}`}>
               queue {queueStats.queued + queueStats.transmitting}
             </span>
           </div>
@@ -194,7 +194,7 @@ export default function TacticalSOSViewport() {
                     <span className="font-black text-zinc-100">{batteryInfo.level}%</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
-                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-300 transition-all duration-500" style={{ width: \`\${batteryInfo.level}%\` }} />
+                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-lime-400 to-amber-300 transition-all duration-500" style={{ width: `${batteryInfo.level}%` }} />
                   </div>
                 </div>
                 <div className="flex min-w-0 items-start gap-3 rounded-lg border border-sky-400/20 bg-sky-400/[.04] p-3">
@@ -202,9 +202,9 @@ export default function TacticalSOSViewport() {
                   <div className="min-w-0 font-mono">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-sky-300">GPS position</p>
                     <p className="mt-1 truncate text-xs font-black text-zinc-100">
-                      {gpsPosition ? \`\${gpsPosition.latitude.toFixed(6)}, \${gpsPosition.longitude.toFixed(6)}\` : 'ACQUIRING FIX…'}
+                      {gpsPosition ? `${gpsPosition.latitude.toFixed(6)}, ${gpsPosition.longitude.toFixed(6)}` : 'ACQUIRING FIX…'}
                     </p>
-                    <p className="mt-1 text-[10px] text-zinc-500">{gpsPosition ? \`±\${Math.round(gpsPosition.accuracy)}M ACCURACY\` : 'NO FIX'}</p>
+                    <p className="mt-1 text-[10px] text-zinc-500">{gpsPosition ? `±${Math.round(gpsPosition.accuracy)}M ACCURACY` : 'NO FIX'}</p>
                   </div>
                 </div>
               </div>
@@ -242,8 +242,8 @@ export default function TacticalSOSViewport() {
 function QueueStatusPanel({ stats }: { stats: ReturnType<typeof getQueueStats> }) {
   const accumulating = stats.queued + stats.transmitting > 0;
   return (
-    <div className={\`rounded-xl border p-4 shadow-xl shadow-black/20 backdrop-blur-md \${accumulating ? 'border-amber-400/35 bg-amber-400/[.06]' : 'border-white/10 bg-zinc-950/70'}\`}>
-      <div className="mb-3 flex items-center justify-between"><PanelLabel>Offline queue</PanelLabel><span className={\`mb-3 rounded px-2 py-1 font-mono text-[9px] font-black uppercase tracking-wider \${accumulating ? 'bg-amber-400/15 text-amber-300' : 'bg-zinc-800 text-zinc-500'}\`}>{accumulating ? 'accumulating' : 'clear'}</span></div>
+    <div className={`rounded-xl border p-4 shadow-xl shadow-black/20 backdrop-blur-md ${accumulating ? 'border-amber-400/35 bg-amber-400/[.06]' : 'border-white/10 bg-zinc-950/70'}`}>
+      <div className="mb-3 flex items-center justify-between"><PanelLabel>Offline queue</PanelLabel><span className={`mb-3 rounded px-2 py-1 font-mono text-[9px] font-black uppercase tracking-wider ${accumulating ? 'bg-amber-400/15 text-amber-300' : 'bg-zinc-800 text-zinc-500'}`}>{accumulating ? 'accumulating' : 'clear'}</span></div>
       <div className="grid grid-cols-2 gap-2 font-mono text-xs">
         <Stat label="queued" value={stats.queued} accent={accumulating ? 'text-amber-300' : 'text-zinc-200'} />
         <Stat label="sending" value={stats.transmitting} accent="text-emerald-300" />
@@ -255,7 +255,7 @@ function QueueStatusPanel({ stats }: { stats: ReturnType<typeof getQueueStats> }
 }
 
 function Stat({ label, value, accent }: { label: string; value: number; accent: string }) {
-  return <div className="rounded-md border border-white/5 bg-black/30 p-2.5"><p className="text-[9px] uppercase tracking-wider text-zinc-500">{label}</p><p className={\`mt-1 text-lg font-black \${accent}\`}>{String(value).padStart(2, '0')}</p></div>;
+  return <div className="rounded-md border border-white/5 bg-black/30 p-2.5"><p className="text-[9px] uppercase tracking-wider text-zinc-500">{label}</p><p className={`mt-1 text-lg font-black ${accent}`}>{String(value).padStart(2, '0')}</p></div>;
 }
 
 function TriageModeSelector({ selected, onChange, disabled }: {
@@ -275,7 +275,7 @@ function TriageModeSelector({ selected, onChange, disabled }: {
   };
   return <div className="grid grid-cols-2 gap-3">{modes.map(({ type, label, icon: Icon, tone }) => (
     <button key={type} type="button" data-active={selected === type} onClick={() => onChange(type)} disabled={disabled}
-      className={\`group min-h-28 rounded-xl border bg-black/25 p-4 text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 \${tones[tone]}\`}>
+      className={`group min-h-28 rounded-xl border bg-black/25 p-4 text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 ${tones[tone]}`}>
       <Icon size={23} className="mb-5 transition-transform duration-200 group-hover:scale-110" />
       <span className="block font-mono text-sm font-black uppercase tracking-wider">{label}</span>
       <span className="mt-1 block font-mono text-[9px] uppercase tracking-[.18em] text-zinc-500">Type 0{type}</span>
@@ -288,10 +288,10 @@ function SurvivalStatusToggles({ isConscious, onConsciousChange, isGroup, onGrou
 }) {
   const controlClass = 'group flex min-h-24 flex-col justify-between rounded-lg border p-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50';
   return <div className="grid grid-cols-2 gap-3">
-    <button type="button" onClick={() => onConsciousChange(!isConscious)} disabled={disabled} className={\`\${controlClass} \${isConscious ? 'border-emerald-400/40 bg-emerald-400/[.07] text-emerald-300' : 'border-red-400/40 bg-red-400/[.07] text-red-300'}\`}>
+    <button type="button" onClick={() => onConsciousChange(!isConscious)} disabled={disabled} className={`${controlClass} ${isConscious ? 'border-emerald-400/40 bg-emerald-400/[.07] text-emerald-300' : 'border-red-400/40 bg-red-400/[.07] text-red-300'}`}>
       <AlertTriangle size={19} /><span className="font-mono text-[10px] font-black uppercase tracking-wider">{isConscious ? 'Conscious' : 'Unconscious'}</span>
     </button>
-    <button type="button" onClick={() => onGroupChange(!isGroup)} disabled={disabled} className={\`\${controlClass} \${isGroup ? 'border-violet-400/40 bg-violet-400/[.07] text-violet-300' : 'border-zinc-700 bg-black/30 text-zinc-300'}\`}>
+    <button type="button" onClick={() => onGroupChange(!isGroup)} disabled={disabled} className={`${controlClass} ${isGroup ? 'border-violet-400/40 bg-violet-400/[.07] text-violet-300' : 'border-zinc-700 bg-black/30 text-zinc-300'}`}>
       {isGroup ? <Users size={19} /> : <User size={19} />}<span className="font-mono text-[10px] font-black uppercase tracking-wider">{isGroup ? 'Group' : 'Solo'}</span>
     </button>
   </div>;
@@ -301,11 +301,11 @@ function HexInspectorDrawer({ hexPayload, payload, isOpen, onToggle }: {
   hexPayload: string; payload: FramePayload; isOpen: boolean; onToggle: (open: boolean) => void;
 }) {
   const fields = [
-    ['NODE ID', \`0x\${payload.nodeId.toString(16).toUpperCase().padStart(8, '0')}\`],
-    ['LATITUDE', \`\${payload.latitude.toFixed(6)}°\`],
-    ['LONGITUDE', \`\${payload.longitude.toFixed(6)}°\`],
-    ['TRIAGE / FLAGS', \`\${payload.triageType} / \${TriageType[payload.triageType]}\`],
-    ['BATTERY / TTL', \`\${payload.batteryPercent.toFixed(0)}% / \${payload.ttl}\`],
+    ['NODE ID', `0x${payload.nodeId.toString(16).toUpperCase().padStart(8, '0')}`],
+    ['LATITUDE', `${payload.latitude.toFixed(6)}°`],
+    ['LONGITUDE', `${payload.longitude.toFixed(6)}°`],
+    ['TRIAGE / FLAGS', `${payload.triageType} / ${TriageType[payload.triageType]}`],
+    ['BATTERY / TTL', `${payload.batteryPercent.toFixed(0)}% / ${payload.ttl}`],
   ];
   return <div className="h-full rounded-xl border border-cyan-400/20 bg-zinc-950/75 p-4 shadow-2xl shadow-black/30 backdrop-blur-md">
     <button type="button" onClick={() => onToggle(!isOpen)} className="flex w-full items-center justify-between text-left transition-colors hover:text-cyan-200">
@@ -336,13 +336,13 @@ function SOSButton({ progress, isHolding, onStart, onEnd, disabled }: {
   return <div className="relative grid h-48 w-48 place-items-center" onPointerDown={(event) => {
     if (disabled) return; event.currentTarget.setPointerCapture(event.pointerId); onStart();
   }} onPointerUp={onEnd} onPointerCancel={onEnd} onLostPointerCapture={onEnd}>
-    <div className={\`absolute inset-2 rounded-full blur-3xl transition duration-300 \${isHolding ? 'bg-red-500/60 animate-pulse' : 'bg-red-500/15'}\`} />
+    <div className={`absolute inset-2 rounded-full blur-3xl transition duration-300 ${isHolding ? 'bg-red-500/60 animate-pulse' : 'bg-red-500/15'}`} />
     <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 160 160" role="progressbar" aria-label="SOS hold progress" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
       <circle cx="80" cy="80" r={ringRadius} fill="none" stroke="#27272a" strokeWidth="3" />
       <circle cx="80" cy="80" r={ringRadius} fill="none" stroke={progress < 100 ? '#fb3f48' : '#facc15'} strokeWidth="4" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" />
     </svg>
-    <button type="button" disabled={disabled} className={\`relative z-10 grid h-32 w-32 place-items-center rounded-full border font-mono transition duration-200 active:scale-95 \${isHolding ? 'scale-105 border-red-300 bg-red-500 text-white shadow-[0_0_40px_rgba(239,68,68,.65)]' : 'border-red-400/70 bg-red-600 text-white shadow-[0_0_28px_rgba(220,38,38,.35)] hover:bg-red-500 hover:shadow-[0_0_38px_rgba(239,68,68,.55)]'} disabled:cursor-not-allowed disabled:opacity-50\`}>
-      <span className="text-center"><span className="block text-2xl font-black tracking-[.16em]">SOS</span><span className="mt-1 block text-[9px] font-bold tracking-[.16em]">{progress ? \`\${Math.ceil(progress / 33.34)} SEC\` : 'HOLD 3 SEC'}</span></span>
+    <button type="button" disabled={disabled} className={`relative z-10 grid h-32 w-32 place-items-center rounded-full border font-mono transition duration-200 active:scale-95 ${isHolding ? 'scale-105 border-red-300 bg-red-500 text-white shadow-[0_0_40px_rgba(239,68,68,.65)]' : 'border-red-400/70 bg-red-600 text-white shadow-[0_0_28px_rgba(220,38,38,.35)] hover:bg-red-500 hover:shadow-[0_0_38px_rgba(239,68,68,.55)]'} disabled:cursor-not-allowed disabled:opacity-50`}>
+      <span className="text-center"><span className="block text-2xl font-black tracking-[.16em]">SOS</span><span className="mt-1 block text-[9px] font-bold tracking-[.16em]">{progress ? `${Math.ceil(progress / 33.34)} SEC` : 'HOLD 3 SEC'}</span></span>
     </button>
   </div>;
 }
