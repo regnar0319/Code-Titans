@@ -12,9 +12,8 @@ interface GPSPosition { latitude: number; longitude: number; accuracy: number; t
 interface BatteryInfo { level: number; charging: boolean; }
 
 const FALLBACK_GPS: GPSPosition = {
-  latitude: 27.986065, longitude: 86.909249, accuracy: 12, timestamp: Date.now(),
+  latitude: 27.986065, longitude: 86.909249, accuracy: 12, timestamp: 0,
 };
-const SIMULATED_DEVICE_ID = Math.floor(Math.random() * 0xffffffff);
 const EMPTY_QUEUE_STATS = { total: 0, queued: 0, transmitting: 0, delivered: 0, failed: 0 };
 
 function PanelLabel({ children }: { children: React.ReactNode }) {
@@ -35,6 +34,7 @@ export default function TacticalSOSViewport() {
   const [hexPayload, setHexPayload] = useState('');
   const [showHexInspector, setShowHexInspector] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [deviceId, setDeviceId] = useState(0);
 
   const holdStartTimeRef = useRef<number | null>(null);
   const holdAnimationFrameRef = useRef<number | null>(null);
@@ -44,6 +44,7 @@ export default function TacticalSOSViewport() {
 
   useEffect(() => {
     setIsMounted(true);
+    setDeviceId(Math.floor(Math.random() * 0xffffffff));
   }, []);
 
   useEffect(() => {
@@ -85,10 +86,10 @@ export default function TacticalSOSViewport() {
   const currentPayload = useMemo<FramePayload>(() => {
     const position = gpsPosition || FALLBACK_GPS;
     return {
-      nodeId: SIMULATED_DEVICE_ID, latitude: position.latitude, longitude: position.longitude,
+      nodeId: deviceId, latitude: position.latitude, longitude: position.longitude,
       triageType, isConscious, groupCount: isGroup, batteryPercent: batteryInfo.level, ttl: 3,
     };
-  }, [gpsPosition, triageType, isConscious, isGroup, batteryInfo.level]);
+  }, [gpsPosition, triageType, isConscious, isGroup, batteryInfo.level, deviceId]);
 
   useEffect(() => {
     try {
